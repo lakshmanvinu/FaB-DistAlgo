@@ -1,4 +1,4 @@
-# fab-distalgo
+# FaB-DistAlgo
 This is a DistAlgo implementation of Fast Byzantine Paxos.
 
 Fast Byzantine Consensus, proposed by Martin et al. was one of the first byzantine consensus algorithms which reach consensus in two communication steps.
