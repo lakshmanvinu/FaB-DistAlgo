@@ -1,0 +1,701 @@
+import math
+from random import randint
+import logging
+
+def valid(cp, value, pnumber, acc, byz):
+    """
+    Checks for commit proof from a quorum of aacceptors
+
+    :param cp: commit proof
+    :type cp: dict
+    :param value: value of proposed element
+    :type value: int
+    :param pnumber: proposal number
+    :type pnumber: int
+    :param acc: number of acceptors
+    :type acc: int
+    :param byz: number of byzantine faults
+    :type byz: int
+    :return: valid
+    :rtype: Bool
+    """
+    l = list(cp.values()).count((value,pnumber)) 
+    if l >= math.ceil((acc+byz+1)/2): # Checks if atleast ceil((acc+byz+1)/2) acceptors have the same (proposal number, value) pairs
+        return True
+    return False
+
+def vouches_for(progcert, value, pnumber, acc, byz):
+    """
+    To check if a progress certificate vouches for a value and proposal number
+
+    :param progcert: progress certificate
+    :type progcert: dict
+    :param value: value proposed for an element
+    :type value: int
+    :param pnumber: proposal number
+    :type pnumber: int
+    :param acc: number of acceptors
+    :type acc: int
+    :param byz: number of byzantine faults
+    :type byz: int
+    :return: vouches for
+    :rtype: Bool
+    """
+    valoccurdict = {}
+    for (key, val) in progcert.items():
+        if val[0] != value:
+            if val[0] in valoccurdict:
+                valoccurdict[val[0]] += 1
+            else:
+                valoccurdict[val[0]] = 1
+    m = 0
+    if valoccurdict:
+        # max number of times a value that is not equal to the value that is trying to get vouched for, occurs in the PC
+        m = max(valoccurdict.values()) 
+    if m >= math.ceil((acc-byz+1)/2):# if this number is greater than a quorum of acceptors, then return false
+        return False
+    count = 0 
+    for (v, pn, cp) in progcert.values():
+        if v != value and valid(cp,v,pn,acc,byz): #Check if an acceptor exists in the PC with a commit proof for a different value than the one being vouched for
+            return False
+    return True
+
+def get_logger_level(mode):
+    """
+    Returns the logger level for output statements
+
+    :param mode: Mode of execution
+    :type mode: int
+    :return: loglevel
+    :rtype: Logging object
+    """
+    if mode == 1 or mode == 4:
+        loglevel = logging.INFO
+    elif mode == 2 or mode == 3:
+        loglevel = logging.DEBUG
+    return loglevel
+
+class Election(process):
+    """
+    This is the Leader election process for the DistAlgo implementation of FaB.
+    This process coordinates leader election between the various proposers and elects the leader.
+    
+    """
+    def setup(proposers:list, acceptors:set, p:int, f:int, mode:int, controller):
+        """
+        Setup method for leader-election process.
+
+        :param proposers: List of proposers
+        :type proposers: list
+        :param acceptors: Set of acceptors
+        :type acceptors: set
+        :param p: Number of proposers
+        :type p: int
+        :param f: Number of byzantine faults
+        :type f: int
+        :param mode: Mode of execution
+        :type mode: int
+        :param controller: Controller process
+        :type controller: process
+        :return: None
+        :rtype: None
+        """
+        self.r = p-1
+        self.leader = None
+        self.proof = None
+        self.loglevel = get_logger_level(mode)
+
+    def sendmessage(msg, recepient):
+        """
+        Wrapper method for the send method in distalgo
+
+        :param msg: message to be sent
+        :type msg: tuple
+        :param recepient: Recepient of the message
+        :type recepient: set
+        """
+        if mode == 2:
+            send(msg, to= recepient)
+            if msg[0] == 'leader':
+                send(msg, to= controller)
+        else:
+            send(msg, to= recepient)
+
+    def getRegency():
+        """
+        Method to return number of current regent. If no correct node suspects it, 
+        regency continues.
+
+        :return: Regency number
+        :rtype: int
+        """
+        return r
+    
+    def getLeader():
+        """
+        Method to return current leader.
+
+        :return: proposer
+        :rtype: process
+        """
+        return proposers[r%p]
+
+    def leaderElection():
+        """
+        Method to perform leader election.
+
+        :return: None
+        :rtype: None
+        """
+        r += 1
+        leader = getLeader()
+        pr = ""
+        for j in range(3):
+            pr+=str(randint(1,10))
+        if pr!= "":
+            proof = pr
+        output('NEW LEADER:',leader,'( Regency:',r,'| Proof:',proof, ')', level=loglevel) 
+        sendmessage(('leader', r, proof), {leader}|acceptors)
+
+    def onSuspect():
+        """
+        This method is called when a proposer suspects the leader. If a quorum of nodes suspect
+        the leader, a new regency is begun and a new leader is elected.
+        """
+        if len(setof(proposer, received(('suspect',_r), from_=proposer))) >= math.ceil((p+f+1)/2):
+            sendmessage(('leaderdone'), leader)
+            output('Leader', leader,'suspected!', level=loglevel)
+            leaderElection()
+
+    def receive(msg=('suspect', pn), from_= proposer):
+        onSuspect()
+
+    def run():
+        """
+        Run method for the leader election. Starts by choosing a proposer as leader and 
+        informs other proposer about the leader election.
+        """
+        leaderElection()
+        await(received(('done')))
+        sendmessage(('leaderdone'), leader)
+        # output('Leader Election terminated.', level=loglevel)
+
+class Proposer(process):
+    """
+    This is the Proposer process for the DistAlgo implementation of 
+    the pseudocode in the paper "Fast Byzantine Consensus" by Jean-Philippe Martin and 
+    Lorenzo Alvisi, Senior member, IEEE. Link to the paper is:
+    http://www.cs.cornell.edu/lorenzo/papers/Martin06Fast.pdf
+    """
+    def setup(proposers:set, learners:set, acceptors:set, election, p:int, a:int, l:int, f:int, mode:int, config, controller):
+        """
+        Setup method for proposer process.
+        
+        :param proposers: set of proposers
+        :type proposers: set
+        :param learners: Set of learners.
+        :type learners: set
+        :param acceptors: Set of acceptors.
+        :type acceptors: set
+        :param election: Leader election process.
+        :type election: process
+        :param p: Number of proposers
+        :type p: int
+        :param a: Number of acceptors
+        :type a: int
+        :param l: Number of learners
+        :type l: int
+        :param f: Number of byzantine faults
+        :type f: int
+        :param mode: Mode of execution
+        :type mode: int
+        :param config: Config for byzantine replication
+        :type config: dict
+        :param controller: Controller process
+        :type controller: process
+        """
+        self.PC = dict()
+        self.isLeader = False
+        self.pnumber = None
+        self.proof = None
+        self.value = None
+        self.config = config
+        self.byzproposal = 3
+        self.loglevel = get_logger_level(mode)
+    
+    def sendmessage(msg, recepient):
+        """
+        Wrapper method for the send method in distalgo
+
+        :param msg: message to be sent
+        :type msg: tuple
+        :param recepient: Recepient of the message
+        :type recepient: set
+        """
+        if mode == 1:
+            send(msg, to= recepient)
+        elif mode == 2:
+            send(msg, to= recepient)
+            if msg[0] == 'propose':
+                send(msg, to= controller)
+        elif mode == 3:
+            send(msg, to= recepient)
+        elif mode == 4: # This is to induce the liveness violation
+            #if process is leader
+            if isLeader and msg[0] == "propose" and byzproposal < 2:
+                    acc = config["leader_config"]["propose_to"][byzproposal]
+                    send(msg, to= acc|proposers)
+                    byzproposal+=1
+                    value += 1
+            # if process is normal proposer
+            else:
+                send(msg, to=recepient)
+
+    def onLearned():
+        """
+        Receive method for the 'learned' message that is sent by learners to proposers.
+        Appends learner to the set Learned and sends 'satisfied' to all proposers if 
+        Learned >= ceil((l+f+1)/2).
+        
+        :return: None
+        :rtype: None
+        """
+        #if a quorum of proposers learn a value for a proposal number, then send the 'satisfied' message to all proposers
+        if len(setof(lrnd, received(('learned', _pnumber, _value), from_=lrnd))) >= math.ceil((l+f+1)/2):
+            sendmessage(('satisfied', pnumber, value), proposers)
+
+    def receive(msg=('learned', pnumber, value), from_= learner):
+        onLearned()
+    
+    def onSatisfied():
+        """
+        Receive method for the 'satisfied' message that is sent by a proposer to all other 
+        proposers. Appends proposer to the set Satisfied. 
+        
+        :return: None
+        :rtype: None
+        """
+        pass
+
+    def receive(msg=('satisfied', pnumber, value), from_= proposer):
+        onSatisfied()
+
+    def receive(msg=('leaderdone'), from_= election):
+        isLeader = False
+
+    def leaderOnStart():
+        """
+        This method is used to send PROPOSE messages to all acceptors until 
+        Satisfied >= ceil((p+f+1)/2).
+        """
+        if isLeader:
+            while not received(('leaderdone'), from_= election):
+                l= len(setof(prop, received(('satisfied', _pnumber, _value), from_=prop)))
+                if (l < math.ceil((p + f + 1)/2)):
+                    output('PROPOSE: ( Pnumber:',pnumber,' | Value:' , value, ')', level=loglevel)
+                    # proposing (PC is null unless recovering)
+                    sendmessage(('propose', pnumber, value, PC), acceptors|proposers)
+                await(False, timeout=3)
+            # output('Leader terminated.', level=loglevel)
+                
+    def leaderOnElected(newnumber, pr):
+        """
+        This method is executed after a leader has been chosen. Sends QUERY to all acceptors
+        and waits for REP from a-f acceptors with a value, proposal number pnumber and 
+        commit_proof. it checks vouches-for for a value v' such that value = v' before starting
+        the leader can start proposing values to acceptors.
+        
+        :param newnumber: new regency number
+        :type newnumber: int
+        :param pr: contains proof of a new leader
+        :type pr: tuple
+        :return: None
+        :rtype: None
+        """
+        pnumber = newnumber
+        proof = pr
+        output('QUERY:', '( Pnumber:',pnumber,' | Proof:',proof, ')',level=loglevel)
+        # When a leader is elected, it sends a QUERY message to get REP
+        # messages from acceptors and form a progress certificate for the new proposal
+        sendmessage(('query', pnumber, proof), acceptors)
+        if await(len(PC) >= a - f):
+            output('PC:',PC, level = loglevel)
+            vals = setof(v, (v, _, _) in PC.values(), v != None)
+            if len(vals)>0:
+                for v in vals:
+                    if vouches_for(PC,v,pnumber,a,f): # Check which value can be vouched for, in the list of values in the progress certificate
+                        value = v
+                        break
+            else:
+                value = randint(1,100)
+            if value!=None:
+                self.leaderOnStart()
+            else:
+                print('\n')
+                print('-'*95)
+                print('#'*36,' LIVENESS VIOLATION! ','#'*36)
+                print('-'*95)
+                print('\n')
+        elif timeout(5):
+            output('TIMEOUT: No response from Acceptors!', level=logging.ERROR)
+            
+
+    def receive(msg=('propose', pnum, val, PC), from_=l):
+        if not isLeader:
+            pnumber = pnum
+            value = val
+
+    def receive(msg=('rep', val, pnum, commit_proof), from_= acceptor):
+        output('REP from', acceptor, '( Value:',val, '| Pnumber', pnum,')', level=loglevel)
+        PC[acceptor] = (val, pnum, commit_proof)
+
+    def receive(msg=('leader', pnum, pr), from_= election):
+        isLeader = True
+        value = None
+        PC = dict()
+        leaderOnElected(pnum, pr)
+
+    def run():
+        """
+        Run method for the proposer. Waits for the timeout before checking if 
+        Learned >= ceil((l+f+1)/2). If this is false, proposer "suspects" the leader.
+        """
+        if mode == 4:
+            byzproposal = config["proposer_config"]["byzpropconf"][self]
+        while not received(('done')):
+            await(False, timeout=4)
+            if not isLeader:
+                if pnumber == None and value == None:
+                    l = len(setof(lrn, received(('learned',_,_), from_=lrn)))
+                else:
+                    l = len(setof(lrn, received(('learned',_pnumber,_value), from_=lrn)))
+                if l < math.ceil((l+f+1)/2): # suspect if a quorum of learners have not sent "learned" after timeout
+                    output('Suspecting leader!',pnumber, level=loglevel)
+                    sendmessage(('suspect', pnumber), election)     
+        # output('Proposer terminated.', level=loglevel)
+
+class Acceptor(process):
+    """
+    This is the Acceptor process for the DistAlgo implementation of 
+    the pseudocode in the paper "Fast Byzantine Consensus" by Jean-Philippe Martin and 
+    Lorenzo Alvisi, Senior member, IEEE. Link to the paper is:
+    http://www.cs.cornell.edu/lorenzo/papers/Martin06Fast.pdf
+
+    """
+    def setup(learners:set, acceptors:set, election, a:int, f:int, mode:int, config, controller):
+        """
+        Setup method for Acceptor process.
+        
+        :param learners: Set of learners.
+        :type learners: set
+        :param acceptors: Set of acceptors.
+        :type acceptors: set
+        :param election: Leader election process.
+        :type election: process
+        :param a: Number of acceptors
+        :type a: int
+        :param f: Number of byzantine faults
+        :type f: int
+        :param mode: Mode of execution
+        :type mode: int
+        :param config: Config for byzantine replication
+        :type config: dict
+        :param controller: Controller process
+        :type controller: process
+        """
+        self.tentative_commit_proof = dict()
+        self.commit_proof = dict()
+        self.accepted = None
+        self.leader = None
+        self.regency = None
+        self.proof = None
+        self.config = config
+        self.resptoacc = 0
+        self.resptorep = 0
+        self.loglevel = get_logger_level(mode)
+
+    def sendmessage(msg, recepient):
+        """
+        Wrapper method for the send method in distalgo
+
+        :param msg: message to be sent
+        :type msg: tuple
+        :param recepient: Recepient of the message
+        :type recepient: set
+        """
+        if mode == 2:
+           send(msg, to= recepient)
+           if msg[0] == 'accepted':
+               send(msg, to= controller)
+        elif mode ==4: # This is to induce the liveness violation
+            # if process is acceptor
+            if msg[0] == "accepted" and resptoacc < 2:
+                acc = set(config["acceptor_config"]["accept_to"][resptoacc][self])
+                send(msg, to= acc)
+                resptoacc+=1
+            elif msg[0] == "rep":
+                if resptorep == 1:
+                    if self in config["acceptor_config"]["rep_from"]:
+                        send(msg, to=recepient)
+                else:
+                    send(msg, to= recepient)
+                resptorep+=1
+            else:
+                send(msg, to= recepient)
+        else:
+            send(msg, to= recepient)
+
+    def onPropose(leader, value, pnumber, progcert):
+        """
+        Receive Proposal from a leader
+        * If the value is proposed by the elected leader, only then the acceptor listens to the proposer, else discard the message
+        * If a new value is proposed by the leader, then change the progress certificate.
+        * Else, accept the value sent by the leader and send accepted message to all the learners and acceptors about the learned value.
+        
+        :param leader: The leader process
+        :type leader: Process
+        :param value: The value accepted
+        :type value: int
+        :param pnumber: The proposal number of the accepted value
+        :type pnumber: int
+        :param progcert: The progress certificate is a list of valid (proposal numbers, accepted values)
+        :type progcert: List<tuples>
+        """
+        if pnumber != regency:
+            return # only listen to current leader
+        if some(received(('accepted', v, pn)), has= (pnumber<=pn or (v!=value and not vouches_for(progcert, value, pnumber, a, f)))):
+            return # only change with progress certificate
+        accepted = (value, pnumber) # accepting
+        tentative_commit_proof[self] = (value,pnumber)
+        output('ACCEPT: ( Pnumber:',pnumber,' | Value:' , value, ')', level=loglevel)
+        sendmessage(('accepted', value, pnumber), learners|acceptors)
+
+    def receive(msg=('propose', pnumber, value, progcert), from_=leader):
+        onPropose(leader, value, pnumber, progcert)
+
+    def onAccepted(value, pnumber, acceptor):
+        """
+        Receive Accepted proposal number and value
+        Update the tentative commit proof of the corresponding acceptor, 
+        check for its validity and send the commit proof to all the learners.
+        
+        :param value: The value accepted
+        :type value: int
+        :param pnumber: The proposal number of the accepted value
+        :type pnumber: int
+        :param acceptor: The acceptor who sent the accepted message
+        :type acceptor: process
+        :return: None
+        """
+        if (tentative_commit_proof == None) or (acceptor not in tentative_commit_proof):
+            tentative_commit_proof[acceptor] = (value, pnumber)
+        else:
+            if tentative_commit_proof[acceptor][1] < pnumber:
+                tentative_commit_proof[acceptor] = (value, pnumber)
+
+        if valid(tentative_commit_proof, value, regency, a, f):
+            output('COMMIT-PROOF: ( Pnumber:',pnumber,' | Value:' , value, ')', level=loglevel)
+            commit_proof = tentative_commit_proof # Tentative commit proof becomes commit proof if a quorum of acceptors agree on one value, proposal number pair.
+            sendmessage(('commitproof', commit_proof), learners)
+
+    def onNewLeader(reg, pr):
+        """
+        Method to store regency and proof, on election of a new leader, 
+        
+        :param reg: The latest regency number
+        :type reg: int
+        :param pr: The proof value for new leader
+        :type pr: int
+        :return: None
+        """
+        regency = reg
+        proof = pr
+
+    def receive(msg=('leader', reg, pr)):
+        onNewLeader(reg, pr)
+
+    def receive(msg=('accepted', value, pnumber), from_= acceptor):
+        onAccepted(value, pnumber, acceptor)
+
+    def onQuery(proposer, pnumber, pr):
+        """
+        Receive onQuery from Proposer
+        Get the regency number of the proposer and check if that proposer is the leader. If not, return bad request. 
+        Else, get the elected leader and send a reply of accepted value to the leader.
+        
+        :param proposer: The proposer process sending the proposal
+        :type proposer: Process
+        :param pnumber: The proposal number of the accepted value
+        :type pnumber: int
+        :param pr: The proof value
+        :type pr: int
+        :return: None
+        """
+        if pr == proof:
+            if pnumber != regency:
+                return # ignore bad requests
+            leader = proposer
+            if accepted!=None:
+                sendmessage(('rep', accepted[0], accepted[1], commit_proof), leader)
+            else:
+                sendmessage(('rep', accepted, pnumber, commit_proof), leader) #Acceptor replies to leader of new proposal with its accepted value
+
+    def receive(msg=('query', pnumber, pr), from_=proposer):
+        onQuery(proposer, pnumber, pr)
+
+    def run():
+        """
+        Method to run the process.
+        """
+        await(received(('done')))
+        # output('Acceptor terminated.',level=loglevel)
+
+class Learner(process):
+    """
+    This is the Learner process for the DistAlgo implementation of 
+    the pseudocode in the paper "Fast Byzantine Consensus" by Jean-Philippe Martin and 
+    Lorenzo Alvisi, Senior member, IEEE. Link to the paper is:
+    http://www.cs.cornell.edu/lorenzo/papers/Martin06Fast.pdf
+    """
+    
+    def setup(proposers:set, acceptors:set, learners:set, a:int, f:int, lt:int, mode:int, config, controller):
+        """
+        Setup method for learner process.
+
+        :param proposers: Set of proposers.
+        :type proposers: set
+        :param acceptors: Set of acceptors.
+        :type acceptors: set
+        :param learners: Set of learners.
+        :type learners: set
+        :param a: Number of acceptors
+        :type a: int
+        :param f: Number of byzantine faults
+        :type f: int
+        :param mode: Mode of execution
+        :type mode: int
+        :param config: Config for byzantine replication
+        :type config: dict
+        :param controller: Controller process
+        :type controller: process
+        """
+        self.learned = None
+        self.accepted = dict()
+        self.commproof = dict()
+        self.loglevel = get_logger_level(mode)
+    
+    def sendmessage(msg, recepient):
+        """
+        Wrapper method for the send method in distalgo
+
+        :param msg: message to be sent
+        :type msg: tuple
+        :param recepient: Recepient of the message
+        :type recepient: set
+        """
+        if mode == 1:
+            send(msg, to= recepient)
+        if mode == 2:
+            send(msg, to= recepient)
+            if msg[0] == 'learned':
+                send(msg, to= controller)
+        elif mode == 3:
+            send(msg, to= recepient)
+        elif mode ==4: pass
+
+    def onAccepted(acceptor, pnumber, value):
+        """
+        Receive method to receive accepted messages from acceptors
+        When an acceptor accepts a value proposed by a proposal number, it sends it to the learner
+        to learn the value.
+        The learner learns the value when the same value is being sent by (a+3f+1)/2 acceptors.
+        
+        :param pnumber: Proposal nunber of the accepted value
+        :type pnumber: int 
+        :param value: Accepted value
+        :type value: int
+        :return: None
+        """
+        accepted[acceptor] = (pnumber, value)
+        #If at least ceil((a+3*f+1)/2) acceptors have accepted a value, then it is "chosen".
+        if len(setof(acc, received(('accepted', _pnumber, _value), from_=acc))) > math.ceil((a+3*f+1)/2):
+            learn(pnumber, value) # learning
+
+    def onCommitProof(cp, acceptor):
+        """
+        Receive method to receive commit-proof messages from acceptors
+        If the learner receives the commit-proof message with the same proposal number and value 
+        from (a+f+1)/2 acceptors then learn the value.
+
+        :param cp: Commit-proof received from an acceptor
+        :type value: int
+        :return: None
+        """
+        if await(acceptor in accepted):
+            pn, val = accepted[acceptor]
+            commproof[acceptor] = cp
+            count = 0
+            for acc in commproof.keys():
+                if valid(commproof[acc],val,pn,a,f):
+                    count+=1
+            if count >= math.ceil((a+f+1)/2):
+                if not learned:
+                    output('COMMITPROOF: ( Pnumber:',pn,' | Value:' , val, ')', level=loglevel)
+                    learn(pn, val) # learning
+        elif timeout(2):pass
+
+    def learn(pnumber, value):
+        """
+        The learn method is executed after majority of the learners learn a value.
+        If there are more than f+1 learners returning the same value,
+        this method sends a message to the proposers with the learned value.
+
+        :param pnumber: Proposal nunber of the accepted value
+        :type pnumber: int 
+        :param value: Accepted value
+        :type value: int
+        :return: None
+        """
+        learned = (pnumber, value) # learning
+        output('LEARNED: ( Pnumber:',pnumber,' | Value:' , value, ')', level=loglevel)
+        sendmessage(('learned', pnumber, value), proposers)
+
+    def onLearned(pnumber, value):
+        """
+        This method is executed when a learner has learnt a value
+
+        :param pnumber: Proposal nunber of the accepted value
+        :type pnumber: int 
+        :param value: Accepted value
+        :type value: int
+        :return: None
+        """
+        if len(setof(lrns, received(('learnt', _pnumber, _value), from_=lrns))) > f+1:
+            learn(pnumber, value)
+
+    def receive(msg=('accepted', value, pnumber), from_=acceptor):
+        onAccepted(acceptor, pnumber, value)
+
+    def receive(msg=('pull'), from_=learner):
+        if learned != None:
+            pn, val = learned
+            sendmessage(('learnt', pn, val), learner)
+
+    def receive(msg=('learnt', pnumber, value), from_=learner):
+        onLearned(pnumber, value)
+
+    def receive(msg=('commitproof',cp), from_=acceptor):
+        onCommitProof(cp, acceptor)
+
+    def run():
+        """
+        Method to run the process. 
+        Starts by sending a pull request to all learners to check if a value has been learned already
+        """
+        await(False, timeout=lt)        
+        if learned!=None:
+            sendmessage(('done'), parent())
+        else:
+            output('Not learned anything!',level=loglevel)
+        await(received(('done')))
+        # output('Learner terminated.',level=loglevel)

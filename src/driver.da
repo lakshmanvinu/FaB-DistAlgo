@@ -1,0 +1,26 @@
+import os
+import sys
+
+file_mode_mapping = ["main.da", "correctness.da", "perf.da", "violation.da"]
+
+def return_run_command(mode, p, a, l, f):
+    run_command = 'python3 -m da ' + file_mode_mapping[mode-1] + ' ' + f + ' ' + p + ' ' + a + ' ' + l 
+    return run_command
+
+def main():
+    print("Execution modes: ")
+    print("Normal Execution - 1\nCorrectness Testing - 2\nPerformance Testing - 3\nByzantine Liveness Violation - 4")    
+    mode = int(input("Enter the execution mode (1/2/3/4): "))
+
+    p,a,l,f = '4','4','4','1'
+    if mode <= 3:
+        p = str(input("Enter the number of proposers: "))
+        a = str(input("Enter the number of acceptors: "))
+        l = str(input("Enter the number of learners: "))
+        f = str(input("Enter the number of byzantine faults: "))
+    
+    if mode <= 4:
+        run_command = return_run_command(mode, p, a, l, f)
+        os.system(run_command)
+    else:
+        print("Please enter a valid input (1/2/3/4).")

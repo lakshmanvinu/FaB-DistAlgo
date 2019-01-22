@@ -1,0 +1,108 @@
+import fab
+import time
+import sys
+import resource
+import math
+from prettytable import PrettyTable
+
+class Controller(process):
+    """
+    This is the Controller process for the Fast Byzantine Consensus to test performance of the implementation
+    """
+    def setup():
+        """
+        Setup method for Performance verification process.
+
+        :return: None
+        :rtype: None
+        """
+        self.startTime = None
+        self.endTime =  None
+        self.startData = None
+        self.endData = None
+            
+    def receive(msg=('consensus'), from_= parent()):
+        printMetrics()
+
+    def printMetrics():
+        """
+        Method to print performance metrics for the algorithm run.
+
+        :return: message to be sent
+        :rtype: tuple
+        """
+        endTime = time.perf_counter()
+        endData = resource.getrusage(resource.RUSAGE_SELF)
+        userTime = (getattr(endData, 'ru_utime') - getattr(startData, 'ru_utime'))
+        systemTime = (getattr(endData, 'ru_stime') - getattr(startData, 'ru_stime'))
+        processTime = round(userTime+systemTime, 8)
+        memoryUsage = endData.ru_maxrss
+        elapsedTime = round(endTime-startTime, 4)
+        print("\n")
+        print('-'*43)
+        print('#'*10,'Performance Evaluation','#'*9)
+        print('-'*43)
+        table = PrettyTable(['Performance Metrics','Values'])
+        # table = PrettyTable(['Performance Metrics','Process Time (seconds)', 'Memory Usage (MB)', 'Time for consensus (seconds)'])
+        stats1 = []
+        stats1.append("Process Time (seconds)")
+        stats1.append(processTime)
+        table.add_row(stats1)
+
+        stats2 = []
+        stats2.append("Memory Usage (KB)")
+        stats2.append(float(memoryUsage/1024))
+        table.add_row(stats2)
+
+        stats3 = []
+        stats3.append("Time for consensus (seconds)")
+        stats3.append(elapsedTime)
+        table.add_row(stats3)
+        print(table)
+        print('#'*43)
+        print('\n')
+
+    def run():
+        startTime = time.perf_counter()
+        startData = resource.getrusage(resource.RUSAGE_SELF)
+        await(received(('done')))
+
+def main():
+    """
+    The main method which is used to spawn Proposer, Acceptor and Learner processes 
+    for the Performance execution mode. 
+    Arguments for the number of proposers, acceptors, learners and byzantine processes
+    will be specified during runtime.
+    """
+    f = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+    p = int(sys.argv[2]) if len(sys.argv) > 2 else 4
+    a = int(sys.argv[3]) if len(sys.argv) > 3 else 6
+    l = int(sys.argv[4]) if len(sys.argv) > 4 else 4
+
+    controller = new(Controller,(), num=1)
+    leaderelect = new(fab.Election)
+    proposers = new(fab.Proposer, num=p)
+    acceptors = new(fab.Acceptor, num=a)
+    learners = new(fab.Learner, num=l)
+    mode = 3
+    lt = 5
+
+    setup(leaderelect,(list(proposers), acceptors, p, f, mode, controller))
+    for proposer in proposers:
+        setup(proposer, (proposers-{proposer}, learners, acceptors, leaderelect, p, a, l, f, mode, None, controller))
+    for acceptor in acceptors:
+        setup(acceptor, (learners, acceptors-{acceptor}, leaderelect, a, f, mode, None, controller))
+    for learner in learners:
+        setup(learner, (proposers, acceptors, learners-{learner}, a, f, lt, mode, None, controller))
+
+    start(controller)
+    start(proposers)
+    start(leaderelect)
+    start(acceptors)
+    start(learners)
+
+    await(each(learner in learners, has=received(('done'), from_=learner)))
+    send(('consensus'), to= controller) # sent to the controller to capture perfromance for implementation
+    send(('done'), to=proposers|acceptors|learners)
+    send(('done'), to=leaderelect)
+    send(('done'), to=controller)

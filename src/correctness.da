@@ -1,0 +1,168 @@
+import math
+import sys
+import fab
+import logging
+from prettytable import PrettyTable
+
+class CorrectnessLiveness(process):
+    """
+    This is the Correctness process for the Fast Byzantine Consensus to verify the correctness of the implementation
+    """
+    def setup(l:int, f:int, a:int):
+        """
+        Setup method for Correctness verification process.
+
+        :param l: Number of learners
+        :type l: int
+        :param f: Number of byzantine faults
+        :type f: int
+        :param a: Number of acceptors
+        :type a: int
+        """
+        self.proposed = set()
+        self.accepted = set()
+        self.terminate = False
+
+    def rule_cs1():
+        '''
+        Only a value that has been proposed must be chosen
+        '''
+        if each((value,_) in accepted, has=(value in proposed)):
+            return True
+        return False
+    
+    def rule_cs2():
+        '''
+        Only a single value may be chosen. 
+        For every proposal number atmost one value is chosen.
+        '''
+        if len(accepted) != 1:
+            return False
+        return True
+    
+    def rule_cs3():
+        '''
+        Only Chosen value may be learned by a correct learner.
+        Some value is eventually stable.
+        '''
+        if len(accepted) > 0:
+            (val, pn) = list(accepted)[0]
+            if len(setof(lrn, received(('learned', _pn, _val), from_=lrn))) > f+1:
+                return True
+        return False
+    
+    def rule_cl1():
+        ''' 
+        Some proposed value is eventually chosen.
+        '''
+        if len(accepted) > 0:
+            (val, pn) = list(accepted)[0]
+            if val in proposed and len(setof(acc, received(('accepted', _val, _pn), from_=acc))) >= math.ceil(0.5*(a+f+1)):
+                return True
+        return False
+
+    def rule_cl2():
+        '''
+        Once a value is chosen, correct learners eventually learn the value.
+        '''
+        if len(accepted) > 0:
+            (val, pn) = list(accepted)[0]
+            if len(setof(lrn, received(('learned', _pn, _val), from_=lrn))) >= math.ceil(0.5*(l-f+1)):
+                return True
+        return False
+
+    def receive(msg=('propose',pnumber, value, PC)):
+        proposed.add(value)
+    
+    def receive(msg=('accepted', value, pnumber)):
+        accepted.add((value, pnumber))
+
+    def receive(msg=('leader', r, _)):
+        accepted.clear()
+        proposed.clear()
+
+    def truth_to_symbol(truth):
+        if truth:
+            return u'\u2713'
+        return u'\u2717'
+
+    def checkCorrectness():
+        print("\n\n")
+        print('-'*56)
+        print('#'*15,'Correctness Verification','#'*15)
+        print('-'*56)
+        print('CS1:Only a value that has been proposed may be chosen')
+        print('CS2:Only a single value may be chosen')
+        print('CS3:Only a chosen value may be learned by a correct learner')
+        print('CL1:Some proposed value is eventually chosen')
+        print('CL2:Correct learners eventually learn a chosen value')
+        cs1 = rule_cs1()
+        cs2 = rule_cs2()
+        cs3 = rule_cs3()
+        cl1 = rule_cl1()
+        cl2 = rule_cl2()
+        sat = cs1 and cs2 and cs3 and cl1 and cl2
+        table = PrettyTable(['Correctness Condition','CS1', 'CS2', 'CS3', 'CL1', 'CL2'])
+        lc = []
+        lc.append('Satisfied ('+u'\u2713'+' / '+u'\u2717'+')')
+        lc.append(truth_to_symbol(cs1))
+        lc.append(truth_to_symbol(cs2))
+        lc.append(truth_to_symbol(cs3))
+        lc.append(truth_to_symbol(cl1))
+        lc.append(truth_to_symbol(cl2))
+        table.add_row(lc)
+        print(table)
+        if sat:
+            print('*'*10,'Correctness condition satisfied!','*'*10)
+        else:
+            print('*'*12,'Correctness condition failed!','*'*12)
+        print('-'*56)
+        print("\n\n")
+        terminate = True
+
+    def run():
+        await(received(('done')))
+        checkCorrectness()
+        await(terminate==True)
+        send(('done'), to=parent())
+
+def main():
+    """
+    The main method which is used to spawn Proposer, Acceptor and Learner processes 
+    for the implementation. 
+    Arguments for the number of proposers, acceptors, learners and byzantine processes
+    will be specified during runtime.
+    """
+    f = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+    p = int(sys.argv[2]) if len(sys.argv) > 2 else 4
+    a = int(sys.argv[3]) if len(sys.argv) > 3 else 6
+    l = int(sys.argv[4]) if len(sys.argv) > 4 else 4
+    lt = 5
+
+    leaderelect = new(fab.Election)
+    proposers = new(fab.Proposer, num=p)
+    acceptors = new(fab.Acceptor, num=a)
+    learners = new(fab.Learner, num=l)
+    correct = new(CorrectnessLiveness)
+    mode = 2
+
+    setup(leaderelect,(list(proposers), acceptors, p, f, mode, correct))
+    setup(correct, (l,f,a))
+    for proposer in proposers:
+        setup(proposer, (proposers-{proposer}, learners, acceptors, leaderelect, p, a, l, f, mode, None, correct))
+    for acceptor in acceptors:
+        setup(acceptor, (learners, acceptors-{acceptor}, leaderelect, a, f, mode, None, correct))
+    for learner in learners:
+        setup(learner, (proposers, acceptors, learners-{learner}, a, f, lt, mode, None, correct))
+
+    start(proposers)
+    start(leaderelect)
+    start(acceptors)
+    start(learners)
+    start(correct)
+    
+    await(each(learner in learners, has=received(('done'), from_=learner)))
+    send(('done'), to=proposers|acceptors|learners)
+    send(('done'), to=leaderelect)
+    send(('done'), to=correct)
+    await(received(('done'), from_=correct))

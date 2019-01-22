@@ -1,0 +1,44 @@
+import sys
+import fab
+
+def main():
+    """
+    The main method which is used to spawn Proposer, Acceptor and Learner processes 
+    for the implementation. 
+    Arguments for the number of proposers, acceptors, learners and byzantine processes
+    will be specified during runtime.
+    """
+    f = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+    p = int(sys.argv[2]) if len(sys.argv) > 2 else 4
+    a = int(sys.argv[3]) if len(sys.argv) > 3 else 6
+    l = int(sys.argv[4]) if len(sys.argv) > 4 else 4
+    lt = 5
+
+    leaderelect = new(fab.Election)
+    proposers = new(fab.Proposer, num=p)
+    acceptors = new(fab.Acceptor, num=a)
+    learners = new(fab.Learner, num=l)
+    mode = 1
+
+    setup(leaderelect,(list(proposers), acceptors, p, f, mode, None))
+    for proposer in proposers:
+        setup(proposer, (proposers-{proposer}, learners, acceptors, leaderelect, p, a, l, f, mode, None, None))
+    for acceptor in acceptors:
+        setup(acceptor, (learners, acceptors-{acceptor}, leaderelect, a, f, mode, None, None))
+    for learner in learners:
+        setup(learner, (proposers, acceptors, learners-{learner}, a, f, lt, mode, None, None))
+
+    print('\n')
+    start(proposers)
+    start(leaderelect)
+    start(acceptors)
+    start(learners)
+
+    await(each(learner in learners, has=received(('done'), from_=learner)))
+    print('\n')
+    print('-'*82)
+    print('#'*30,' CONSENSUS REACHED! ','#'*30)
+    print('-'*82)
+    print('\n')
+    send(('done'), to=proposers|acceptors|learners)
+    send(('done'), to=leaderelect)

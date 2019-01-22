@@ -1,0 +1,923 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src package &#8212; FaB-DistAlgo 2.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="src-package">
+<h1>src package<a class="headerlink" href="#src-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.correctness">
+<span id="src-correctness-module"></span><h2>src.correctness module<a class="headerlink" href="#module-src.correctness" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.correctness.CorrectnessLiveness">
+<em class="property">class </em><code class="descclassname">src.correctness.</code><code class="descname">CorrectnessLiveness</code><span class="sig-paren">(</span><em>procimpl</em>, <em>forwarder</em>, <em>**props</em><span class="sig-paren">)</span><a class="headerlink" href="#src.correctness.CorrectnessLiveness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">da.sim.DistProcess</span></code></p>
+<p>This is the Correctness process for the Fast Byzantine Consensus to verify the correctness of the implementation</p>
+<dl class="method">
+<dt id="src.correctness.CorrectnessLiveness.checkCorrectness">
+<code class="descname">checkCorrectness</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.correctness.CorrectnessLiveness.checkCorrectness" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="src.correctness.CorrectnessLiveness.rule_cl1">
+<code class="descname">rule_cl1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.correctness.CorrectnessLiveness.rule_cl1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Some proposed value is eventually chosen.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.correctness.CorrectnessLiveness.rule_cl2">
+<code class="descname">rule_cl2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.correctness.CorrectnessLiveness.rule_cl2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Once a value is chosen, correct learners eventually learn the value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.correctness.CorrectnessLiveness.rule_cs1">
+<code class="descname">rule_cs1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.correctness.CorrectnessLiveness.rule_cs1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only a value that has been proposed must be chosen</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.correctness.CorrectnessLiveness.rule_cs2">
+<code class="descname">rule_cs2</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.correctness.CorrectnessLiveness.rule_cs2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only a single value may be chosen. 
+For every proposal number atmost one value is chosen.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.correctness.CorrectnessLiveness.rule_cs3">
+<code class="descname">rule_cs3</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.correctness.CorrectnessLiveness.rule_cs3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only Chosen value may be learned by a correct learner.
+Some value is eventually stable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.correctness.CorrectnessLiveness.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.correctness.CorrectnessLiveness.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Entry point for the DistAlgo process.</p>
+<p>This is the starting point of execution for user code.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.correctness.CorrectnessLiveness.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>l</em>, <em>f</em>, <em>a</em><span class="sig-paren">)</span><a class="headerlink" href="#src.correctness.CorrectnessLiveness.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup method for Correctness verification process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>l</strong> (<em>int</em>) – Number of learners</li>
+<li><strong>f</strong> (<em>int</em>) – Number of byzantine faults</li>
+<li><strong>a</strong> (<em>int</em>) – Number of acceptors</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.correctness.Main">
+<em class="property">class </em><code class="descclassname">src.correctness.</code><code class="descname">Main</code><span class="sig-paren">(</span><em>procimpl</em>, <em>forwarder</em>, <em>**props</em><span class="sig-paren">)</span><a class="headerlink" href="#src.correctness.Main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">da.sim.NodeProcess</span></code></p>
+<dl class="method">
+<dt id="src.correctness.Main.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.correctness.Main.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main method which is used to spawn Proposer, Acceptor and Learner processes 
+for the implementation. 
+Arguments for the number of proposers, acceptors, learners and byzantine processes
+will be specified during runtime.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.fab">
+<span id="src-fab-module"></span><h2>src.fab module<a class="headerlink" href="#module-src.fab" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.fab.Acceptor">
+<em class="property">class </em><code class="descclassname">src.fab.</code><code class="descname">Acceptor</code><span class="sig-paren">(</span><em>procimpl</em>, <em>forwarder</em>, <em>**props</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Acceptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">da.sim.DistProcess</span></code></p>
+<p>This is the Acceptor process for the DistAlgo implementation of 
+the pseudocode in the paper “Fast Byzantine Consensus” by Jean-Philippe Martin and 
+Lorenzo Alvisi, Senior member, IEEE. Link to the paper is:
+<a class="reference external" href="http://www.cs.cornell.edu/lorenzo/papers/Martin06Fast.pdf">http://www.cs.cornell.edu/lorenzo/papers/Martin06Fast.pdf</a></p>
+<dl class="method">
+<dt id="src.fab.Acceptor.onAccepted">
+<code class="descname">onAccepted</code><span class="sig-paren">(</span><em>value</em>, <em>pnumber</em>, <em>acceptor</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Acceptor.onAccepted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive Accepted proposal number and value
+Update the tentative commit proof of the corresponding acceptor, 
+check for its validity and send the commit proof to all the learners.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value</strong> (<em>int</em>) – The value accepted</li>
+<li><strong>pnumber</strong> (<em>int</em>) – The proposal number of the accepted value</li>
+<li><strong>acceptor</strong> (<em>process</em>) – The acceptor who sent the accepted message</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Acceptor.onNewLeader">
+<code class="descname">onNewLeader</code><span class="sig-paren">(</span><em>reg</em>, <em>pr</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Acceptor.onNewLeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to store regency and proof, on election of a new leader,</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>reg</strong> (<em>int</em>) – The latest regency number</li>
+<li><strong>pr</strong> (<em>int</em>) – The proof value for new leader</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Acceptor.onPropose">
+<code class="descname">onPropose</code><span class="sig-paren">(</span><em>leader</em>, <em>value</em>, <em>pnumber</em>, <em>progcert</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Acceptor.onPropose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive Proposal from a leader
+* If the value is proposed by the elected leader, only then the acceptor listens to the proposer, else discard the message
+* If a new value is proposed by the leader, then change the progress certificate.
+* Else, accept the value sent by the leader and send accepted message to all the learners and acceptors about the learned value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>leader</strong> (<em>Process</em>) – The leader process</li>
+<li><strong>value</strong> (<em>int</em>) – The value accepted</li>
+<li><strong>pnumber</strong> (<em>int</em>) – The proposal number of the accepted value</li>
+<li><strong>progcert</strong> (<em>List&lt;tuples&gt;</em>) – The progress certificate is a list of valid (proposal numbers, accepted values)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Acceptor.onQuery">
+<code class="descname">onQuery</code><span class="sig-paren">(</span><em>proposer</em>, <em>pnumber</em>, <em>pr</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Acceptor.onQuery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive onQuery from Proposer
+Get the regency number of the proposer and check if that proposer is the leader. If not, return bad request. 
+Else, get the elected leader and send a reply of accepted value to the leader.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>proposer</strong> (<em>Process</em>) – The proposer process sending the proposal</li>
+<li><strong>pnumber</strong> (<em>int</em>) – The proposal number of the accepted value</li>
+<li><strong>pr</strong> (<em>int</em>) – The proof value</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Acceptor.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Acceptor.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to run the process.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Acceptor.sendmessage">
+<code class="descname">sendmessage</code><span class="sig-paren">(</span><em>msg</em>, <em>recepient</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Acceptor.sendmessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper method for the send method in distalgo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>msg</strong> (<em>tuple</em>) – message to be sent</li>
+<li><strong>recepient</strong> (<em>set</em>) – Recepient of the message</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Acceptor.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>learners</em>, <em>acceptors</em>, <em>election</em>, <em>a</em>, <em>f</em>, <em>mode</em>, <em>config</em>, <em>controller</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Acceptor.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup method for Acceptor process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>learners</strong> (<em>set</em>) – Set of learners.</li>
+<li><strong>acceptors</strong> (<em>set</em>) – Set of acceptors.</li>
+<li><strong>election</strong> (<em>process</em>) – Leader election process.</li>
+<li><strong>a</strong> (<em>int</em>) – Number of acceptors</li>
+<li><strong>f</strong> (<em>int</em>) – Number of byzantine faults</li>
+<li><strong>mode</strong> (<em>int</em>) – Mode of execution</li>
+<li><strong>config</strong> (<em>dict</em>) – Config for byzantine replication</li>
+<li><strong>controller</strong> (<em>process</em>) – Controller process</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.fab.Election">
+<em class="property">class </em><code class="descclassname">src.fab.</code><code class="descname">Election</code><span class="sig-paren">(</span><em>procimpl</em>, <em>forwarder</em>, <em>**props</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Election" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">da.sim.DistProcess</span></code></p>
+<p>This is the Leader election process for the DistAlgo implementation of FaB.
+This process coordinates leader election between the various proposers and elects the leader.</p>
+<dl class="method">
+<dt id="src.fab.Election.getLeader">
+<code class="descname">getLeader</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Election.getLeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to return current leader.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">proposer</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">process</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Election.getRegency">
+<code class="descname">getRegency</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Election.getRegency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to return number of current regent. If no correct node suspects it, 
+regency continues.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Regency number</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Election.leaderElection">
+<code class="descname">leaderElection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Election.leaderElection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to perform leader election.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Election.onSuspect">
+<code class="descname">onSuspect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Election.onSuspect" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is called when a proposer suspects the leader. If a quorum of nodes suspect
+the leader, a new regency is begun and a new leader is elected.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Election.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Election.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run method for the leader election. Starts by choosing a proposer as leader and 
+informs other proposer about the leader election.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Election.sendmessage">
+<code class="descname">sendmessage</code><span class="sig-paren">(</span><em>msg</em>, <em>recepient</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Election.sendmessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper method for the send method in distalgo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>msg</strong> (<em>tuple</em>) – message to be sent</li>
+<li><strong>recepient</strong> (<em>set</em>) – Recepient of the message</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Election.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>proposers</em>, <em>acceptors</em>, <em>p</em>, <em>f</em>, <em>mode</em>, <em>controller</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Election.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup method for leader-election process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>proposers</strong> (<em>list</em>) – List of proposers</li>
+<li><strong>acceptors</strong> (<em>set</em>) – Set of acceptors</li>
+<li><strong>p</strong> (<em>int</em>) – Number of proposers</li>
+<li><strong>f</strong> (<em>int</em>) – Number of byzantine faults</li>
+<li><strong>mode</strong> (<em>int</em>) – Mode of execution</li>
+<li><strong>controller</strong> (<em>process</em>) – Controller process</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">None</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.fab.Learner">
+<em class="property">class </em><code class="descclassname">src.fab.</code><code class="descname">Learner</code><span class="sig-paren">(</span><em>procimpl</em>, <em>forwarder</em>, <em>**props</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Learner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">da.sim.DistProcess</span></code></p>
+<p>This is the Learner process for the DistAlgo implementation of 
+the pseudocode in the paper “Fast Byzantine Consensus” by Jean-Philippe Martin and 
+Lorenzo Alvisi, Senior member, IEEE. Link to the paper is:
+<a class="reference external" href="http://www.cs.cornell.edu/lorenzo/papers/Martin06Fast.pdf">http://www.cs.cornell.edu/lorenzo/papers/Martin06Fast.pdf</a></p>
+<dl class="method">
+<dt id="src.fab.Learner.learn">
+<code class="descname">learn</code><span class="sig-paren">(</span><em>pnumber</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Learner.learn" title="Permalink to this definition">¶</a></dt>
+<dd><p>The learn method is executed after majority of the learners learn a value.
+If there are more than f+1 learners returning the same value,
+this method sends a message to the proposers with the learned value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pnumber</strong> (<em>int</em>) – Proposal nunber of the accepted value</li>
+<li><strong>value</strong> (<em>int</em>) – Accepted value</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Learner.onAccepted">
+<code class="descname">onAccepted</code><span class="sig-paren">(</span><em>acceptor</em>, <em>pnumber</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Learner.onAccepted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive method to receive accepted messages from acceptors
+When an acceptor accepts a value proposed by a proposal number, it sends it to the learner
+to learn the value.
+The learner learns the value when the same value is being sent by (a+3f+1)/2 acceptors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pnumber</strong> (<em>int</em>) – Proposal nunber of the accepted value</li>
+<li><strong>value</strong> (<em>int</em>) – Accepted value</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Learner.onCommitProof">
+<code class="descname">onCommitProof</code><span class="sig-paren">(</span><em>cp</em>, <em>acceptor</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Learner.onCommitProof" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive method to receive commit-proof messages from acceptors
+If the learner receives the commit-proof message with the same proposal number and value 
+from (a+f+1)/2 acceptors then learn the value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cp</strong> – Commit-proof received from an acceptor</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Learner.onLearned">
+<code class="descname">onLearned</code><span class="sig-paren">(</span><em>pnumber</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Learner.onLearned" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is executed when a learner has learnt a value</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pnumber</strong> (<em>int</em>) – Proposal nunber of the accepted value</li>
+<li><strong>value</strong> (<em>int</em>) – Accepted value</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Learner.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Learner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to run the process. 
+Starts by sending a pull request to all learners to check if a value has been learned already</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Learner.sendmessage">
+<code class="descname">sendmessage</code><span class="sig-paren">(</span><em>msg</em>, <em>recepient</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Learner.sendmessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper method for the send method in distalgo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>msg</strong> (<em>tuple</em>) – message to be sent</li>
+<li><strong>recepient</strong> (<em>set</em>) – Recepient of the message</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Learner.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>proposers</em>, <em>acceptors</em>, <em>learners</em>, <em>a</em>, <em>f</em>, <em>lt</em>, <em>mode</em>, <em>config</em>, <em>controller</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Learner.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup method for learner process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>proposers</strong> (<em>set</em>) – Set of proposers.</li>
+<li><strong>acceptors</strong> (<em>set</em>) – Set of acceptors.</li>
+<li><strong>learners</strong> (<em>set</em>) – Set of learners.</li>
+<li><strong>a</strong> (<em>int</em>) – Number of acceptors</li>
+<li><strong>f</strong> (<em>int</em>) – Number of byzantine faults</li>
+<li><strong>mode</strong> (<em>int</em>) – Mode of execution</li>
+<li><strong>config</strong> (<em>dict</em>) – Config for byzantine replication</li>
+<li><strong>controller</strong> (<em>process</em>) – Controller process</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.fab.Proposer">
+<em class="property">class </em><code class="descclassname">src.fab.</code><code class="descname">Proposer</code><span class="sig-paren">(</span><em>procimpl</em>, <em>forwarder</em>, <em>**props</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Proposer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">da.sim.DistProcess</span></code></p>
+<p>This is the Proposer process for the DistAlgo implementation of 
+the pseudocode in the paper “Fast Byzantine Consensus” by Jean-Philippe Martin and 
+Lorenzo Alvisi, Senior member, IEEE. Link to the paper is:
+<a class="reference external" href="http://www.cs.cornell.edu/lorenzo/papers/Martin06Fast.pdf">http://www.cs.cornell.edu/lorenzo/papers/Martin06Fast.pdf</a></p>
+<dl class="method">
+<dt id="src.fab.Proposer.leaderOnElected">
+<code class="descname">leaderOnElected</code><span class="sig-paren">(</span><em>newnumber</em>, <em>pr</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Proposer.leaderOnElected" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is executed after a leader has been chosen. Sends QUERY to all acceptors
+and waits for REP from a-f acceptors with a value, proposal number pnumber and 
+commit_proof. it checks vouches-for for a value v’ such that value = v’ before starting
+the leader can start proposing values to acceptors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>newnumber</strong> (<em>int</em>) – new regency number</li>
+<li><strong>pr</strong> (<em>tuple</em>) – contains proof of a new leader</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">None</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Proposer.leaderOnStart">
+<code class="descname">leaderOnStart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Proposer.leaderOnStart" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is used to send PROPOSE messages to all acceptors until 
+Satisfied &gt;= ceil((p+f+1)/2).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Proposer.onLearned">
+<code class="descname">onLearned</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Proposer.onLearned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive method for the ‘learned’ message that is sent by learners to proposers.
+Appends learner to the set Learned and sends ‘satisfied’ to all proposers if 
+Learned &gt;= ceil((l+f+1)/2).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Proposer.onSatisfied">
+<code class="descname">onSatisfied</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Proposer.onSatisfied" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive method for the ‘satisfied’ message that is sent by a proposer to all other 
+proposers. Appends proposer to the set Satisfied.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Proposer.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Proposer.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run method for the proposer. Waits for the timeout before checking if 
+Learned &gt;= ceil((l+f+1)/2). If this is false, proposer “suspects” the leader.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Proposer.sendmessage">
+<code class="descname">sendmessage</code><span class="sig-paren">(</span><em>msg</em>, <em>recepient</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Proposer.sendmessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper method for the send method in distalgo</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>msg</strong> (<em>tuple</em>) – message to be sent</li>
+<li><strong>recepient</strong> (<em>set</em>) – Recepient of the message</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.fab.Proposer.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>proposers</em>, <em>learners</em>, <em>acceptors</em>, <em>election</em>, <em>p</em>, <em>a</em>, <em>l</em>, <em>f</em>, <em>mode</em>, <em>config</em>, <em>controller</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.Proposer.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup method for proposer process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>proposers</strong> (<em>set</em>) – set of proposers</li>
+<li><strong>learners</strong> (<em>set</em>) – Set of learners.</li>
+<li><strong>acceptors</strong> (<em>set</em>) – Set of acceptors.</li>
+<li><strong>election</strong> (<em>process</em>) – Leader election process.</li>
+<li><strong>p</strong> (<em>int</em>) – Number of proposers</li>
+<li><strong>a</strong> (<em>int</em>) – Number of acceptors</li>
+<li><strong>l</strong> (<em>int</em>) – Number of learners</li>
+<li><strong>f</strong> (<em>int</em>) – Number of byzantine faults</li>
+<li><strong>mode</strong> (<em>int</em>) – Mode of execution</li>
+<li><strong>config</strong> (<em>dict</em>) – Config for byzantine replication</li>
+<li><strong>controller</strong> (<em>process</em>) – Controller process</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="src.fab.get_logger_level">
+<code class="descclassname">src.fab.</code><code class="descname">get_logger_level</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.get_logger_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the logger level for output statements</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> (<em>int</em>) – Mode of execution</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">loglevel</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Logging object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.fab.valid">
+<code class="descclassname">src.fab.</code><code class="descname">valid</code><span class="sig-paren">(</span><em>cp</em>, <em>value</em>, <em>pnumber</em>, <em>acc</em>, <em>byz</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks for commit proof from a quorum of aacceptors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cp</strong> (<em>dict</em>) – commit proof</li>
+<li><strong>value</strong> (<em>int</em>) – value of proposed element</li>
+<li><strong>pnumber</strong> (<em>int</em>) – proposal number</li>
+<li><strong>acc</strong> (<em>int</em>) – number of acceptors</li>
+<li><strong>byz</strong> (<em>int</em>) – number of byzantine faults</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">valid</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="src.fab.vouches_for">
+<code class="descclassname">src.fab.</code><code class="descname">vouches_for</code><span class="sig-paren">(</span><em>progcert</em>, <em>value</em>, <em>pnumber</em>, <em>acc</em>, <em>byz</em><span class="sig-paren">)</span><a class="headerlink" href="#src.fab.vouches_for" title="Permalink to this definition">¶</a></dt>
+<dd><p>To check if a progress certificate vouches for a value and proposal number</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>progcert</strong> (<em>dict</em>) – progress certificate</li>
+<li><strong>value</strong> (<em>int</em>) – value proposed for an element</li>
+<li><strong>pnumber</strong> (<em>int</em>) – proposal number</li>
+<li><strong>acc</strong> (<em>int</em>) – number of acceptors</li>
+<li><strong>byz</strong> (<em>int</em>) – number of byzantine faults</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">vouches for</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.main">
+<span id="src-main-module"></span><h2>src.main module<a class="headerlink" href="#module-src.main" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.main.Main">
+<em class="property">class </em><code class="descclassname">src.main.</code><code class="descname">Main</code><span class="sig-paren">(</span><em>procimpl</em>, <em>forwarder</em>, <em>**props</em><span class="sig-paren">)</span><a class="headerlink" href="#src.main.Main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="src.main.Main.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.main.Main.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main method which is used to spawn Proposer, Acceptor and Learner processes 
+for the implementation. 
+Arguments for the number of proposers, acceptors, learners and byzantine processes
+will be specified during runtime.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.perf">
+<span id="src-perf-module"></span><h2>src.perf module<a class="headerlink" href="#module-src.perf" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.perf.Controller">
+<em class="property">class </em><code class="descclassname">src.perf.</code><code class="descname">Controller</code><span class="sig-paren">(</span><em>procimpl</em>, <em>forwarder</em>, <em>**props</em><span class="sig-paren">)</span><a class="headerlink" href="#src.perf.Controller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">da.sim.DistProcess</span></code></p>
+<p>This is the Controller process for the Fast Byzantine Consensus to test performance of the implementation</p>
+<dl class="method">
+<dt id="src.perf.Controller.printMetrics">
+<code class="descname">printMetrics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.perf.Controller.printMetrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to print performance metrics for the algorithm run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">message to be sent</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.perf.Controller.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.perf.Controller.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Entry point for the DistAlgo process.</p>
+<p>This is the starting point of execution for user code.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="src.perf.Controller.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.perf.Controller.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup method for Performance verification process.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="src.perf.Main">
+<em class="property">class </em><code class="descclassname">src.perf.</code><code class="descname">Main</code><span class="sig-paren">(</span><em>procimpl</em>, <em>forwarder</em>, <em>**props</em><span class="sig-paren">)</span><a class="headerlink" href="#src.perf.Main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">da.sim.NodeProcess</span></code></p>
+<dl class="method">
+<dt id="src.perf.Main.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.perf.Main.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main method which is used to spawn Proposer, Acceptor and Learner processes 
+for the Performance execution mode. 
+Arguments for the number of proposers, acceptors, learners and byzantine processes
+will be specified during runtime.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.violation">
+<span id="src-violation-module"></span><h2>src.violation module<a class="headerlink" href="#module-src.violation" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="src.violation.Main">
+<em class="property">class </em><code class="descclassname">src.violation.</code><code class="descname">Main</code><span class="sig-paren">(</span><em>procimpl</em>, <em>forwarder</em>, <em>**props</em><span class="sig-paren">)</span><a class="headerlink" href="#src.violation.Main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">da.sim.NodeProcess</span></code></p>
+<dl class="method">
+<dt id="src.violation.Main.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#src.violation.Main.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>The main method for the class that drives Byzantine behaviour in the system.
+This is used to spawn Proposer, Acceptor and Learner processes 
+for the implementation. 
+Arguments for the number of proposers, acceptors, learners and byzantine processes
+will be specified during runtime.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="src.violation.generate_config">
+<code class="descclassname">src.violation.</code><code class="descname">generate_config</code><span class="sig-paren">(</span><em>prop_ids</em>, <em>acc_ids</em>, <em>lrn_ids</em><span class="sig-paren">)</span><a class="headerlink" href="#src.violation.generate_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method generates the desired configuration required to reproduce the liveness violation
+discussed in the paper <a class="reference external" href="https://arxiv.org/pdf/1712.01367.pdf">https://arxiv.org/pdf/1712.01367.pdf</a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">FaB-DistAlgo</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Lakshmi Narayanan Rajendran, Pavan Kottapalli, Siddarth Harinarayanan.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/src.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
